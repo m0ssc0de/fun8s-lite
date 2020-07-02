@@ -1,3 +1,5 @@
+#[macro_use]
+extern crate cmd_lib;
 mod error;
 mod k8s;
 mod mesh;
