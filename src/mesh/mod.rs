@@ -107,14 +107,10 @@ fn join_run(arg: &ARG) -> Result<(), ioErr> {
     let dec_tar = &decode(arg.mesh_cfg.as_ref().unwrap()).unwrap();
     fs::write("/etc/nebula/tmp.tar.gz", dec_tar)?;
     run_cmd!("tar -zxvf tmp.tar.gz")?;
-    run_cmd!("cd {}", arg.name)?;
-    run_cmd!(
-        cp config.yml ca.crt host.crt host.key ../
-        systemctl daemon-reload || true
-        systemctl stop nebula || true
-        systemctl restart nebula || true
-        systemctl enable --now nebula
-    )?;
+    run_cmd!("cd /etc/nebula/{}", arg.name)?;
+    run_cmd!("pwd")?;
+    run_cmd!("cp config.yml ca.crt host.crt host.key /etc/nebula")?;
+    run_cmd!("systemctl enable --now nebula")?;
     Ok(())
 }
 
