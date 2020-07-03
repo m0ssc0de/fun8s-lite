@@ -17,10 +17,12 @@ pub fn init(pub_addr: std::net::IpAddr) -> Result<(), Error> {
 
 pub fn create_join() -> Result<ARG, Error> {
     match load_ip() {
-        Ok(ip) => {
-            //TODO
-            //next ip
-            generate_host(ip, None)
+        Ok(net) => {
+            let mut it = net.iter().skip_while(|x| *x <= net.ip());
+            match ipnetwork::IpNetwork::new(it.next().unwrap(), net.prefix()) {
+                Ok(ip) => generate_host(ip, None),
+                Err(_) => Err(Error::IPAMPersistenceFail),
+            }
         }
         Err(e) => {
             println!("{}", e);

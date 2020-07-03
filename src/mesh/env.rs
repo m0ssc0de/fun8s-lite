@@ -22,7 +22,7 @@ impl ENV {
         if let Err(_) = run_cmd!("test -f '/etc/systemd/system/nebula.service'") {
             return Err(Error::NeedSetupMesh);
         }
-        if let Err(_) = run_cmd!("test -d '/etc/nebula'") {
+        if let Err(_) = run_cmd!("test -d '/etc/nebula/'") {
             return Err(Error::NeedSetupMesh);
         }
         Ok(())
