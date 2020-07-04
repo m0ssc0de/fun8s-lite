@@ -1,4 +1,5 @@
 use crate::error::Error;
+use std::fs;
 
 pub struct ENV {}
 
@@ -28,7 +29,7 @@ impl ENV {
         Ok(())
     }
     fn install(&self) -> Result<(), Error> {
-        if let Err(e) = run_cmd!(
+        let s = r#"
             mkdir -p /tmp/tmp-nebula/
             mkdir -p /etc/nebula/
 
@@ -38,13 +39,10 @@ impl ENV {
             pwd
             cp ./nebula ./nebula-cert /usr/local/bin/
 
-            wget https://github.com/mikefarah/yq/releases/download/3.3.2/yq_linux_amd64
-            mv yq_linux_amd64 /usr/local/bin/yq
-            chmod +x /usr/local/bin/yq
-
             wget https://raw.githubusercontent.com/slackhq/nebula/master/examples/service_scripts/nebula.service
             cp ./nebula.service /etc/systemd/system/nebula.service
-        ) {
+        "#;
+        if let Err(e) = run_s(s) {
             println!("install error {}", e);
             return Err(Error::SetupMeshFail);
         }
@@ -54,4 +52,10 @@ impl ENV {
 
 pub fn new() -> ENV {
     ENV {}
+}
+
+fn run_s(s: &str) -> Result<(), std::io::Error> {
+    fs::write("/tmp/s", s)?;
+    run_cmd!("bash /tmp/s")?;
+    Ok(())
 }
