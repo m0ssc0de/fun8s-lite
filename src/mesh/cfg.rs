@@ -1,4 +1,4 @@
-pub static l: &str = r#"
+pub static L: &str = r#"
 pki:
   ca: /etc/nebula/ca.crt
   cert: /etc/nebula/host.crt

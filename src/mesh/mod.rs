@@ -88,7 +88,7 @@ fn generate_host_run(
     run_cmd!("mv {}.key {}/host.key", name, name)?;
     run_cmd!("cp ca.crt {}/ca.crt", name)?;
     if let Some(l) = is_light {
-        let s = cfg::l.replace("21.21.21.21", &l.to_string());
+        let s = cfg::L.replace("21.21.21.21", &l.to_string());
         println!("{}", s);
         fs::write(format!("/etc/nebula/{}/config.yml", name), s).expect("Unable to write file");
     }

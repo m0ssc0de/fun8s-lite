@@ -1,6 +1,4 @@
-use ipnetwork;
 use std::fmt;
-use std::io;
 
 pub enum Error {
     TokenError,

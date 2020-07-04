@@ -7,11 +7,7 @@ mod k8s;
 mod mesh;
 mod token;
 
-use base64::encode;
 use error::Error;
-use serde;
-use serde_json;
-use serde_json::json;
 
 fn main() {
     run().unwrap();
@@ -67,24 +63,4 @@ fn run() -> Result<(), Error> {
     }
 
     Ok(())
-    // Same as before...
-    // {
-    // cmd init
-    // let arg = mesh::init("114.114.114.114".parse().unwrap())?;
-    // k8s::init(arg)?;
-    // }
-
-    // {
-    // cmd create join
-    // let arg = mesh::create_join()?;
-    // k8s::create_join(arg)?;
-    // }
-
-    // {
-    // let arg = "oiwjocijoiej".parse::<token::ARG>()?;
-    // mesh::join(&arg)?;
-    // k8s::join(&arg)?;
-    // }
-
-    // Ok(())
 }

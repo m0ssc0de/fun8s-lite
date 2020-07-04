@@ -30,9 +30,3 @@ impl Display for ARG {
         write!(f, "{}", serde_json::to_string(self).unwrap())
     }
 }
-
-impl ARG {
-    pub fn test_update(&mut self) -> Result<(), Error> {
-        Ok(())
-    }
-}
