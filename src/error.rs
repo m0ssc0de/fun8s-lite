@@ -7,6 +7,8 @@ pub enum Error {
     InitMeshFail,
     JoinMeshFail,
     IPAMPersistenceFail,
+    NeedSetupK8s,
+    SetupK8sFail,
 }
 
 impl fmt::Debug for Error {
@@ -19,6 +21,8 @@ impl fmt::Debug for Error {
             InitMeshFail => write!(f, "Init mesh fail"),
             JoinMeshFail => write!(f, "Join mesh fail"),
             IPAMPersistenceFail => write!(f, "Can not persistence ip in file"),
+            NeedSetupK8s => write!(f, "Need setup k8s env"),
+            SetupK8sFail => write!(f, "Setup k8s env fail"),
         }
     }
 }
