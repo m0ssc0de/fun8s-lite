@@ -4,6 +4,7 @@ use crate::error::Error;
 use crate::token::ARG;
 
 pub fn init(mut a: ARG) -> Result<ARG, Error> {
+    env::new().setup()?;
     a.test = "owijeofij".to_string();
     Ok(a)
 }
