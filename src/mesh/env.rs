@@ -45,12 +45,10 @@ impl ENV {
             mkdir -p /etc/nebula/
 
             cd /tmp/tmp-nebula/
-            // wget https://github.com/slackhq/nebula/releases/download/v1.2.0/nebula-linux-amd64.tar.gz
             tar -zxvf nebula-linux-amd64.tar.gz
             pwd
             cp ./nebula ./nebula-cert /usr/local/bin/
 
-            // wget https://raw.githubusercontent.com/slackhq/nebula/master/examples/service_scripts/nebula.service
             cp ./nebula.service /etc/systemd/system/nebula.service
         ) {
             println!("install error {}", e);
