@@ -85,7 +85,6 @@ fn generate_host_run(
     let s = r#"
         cd /etc/nebula/
         SIGN_S
-        MV_S
         mkdir -p NODE_N
         mv NODE_N.crt NODE_N/host.crt
         mv NODE_N.key NODE_N/host.key
