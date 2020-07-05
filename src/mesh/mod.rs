@@ -119,6 +119,7 @@ fn generate_host_run(
         test: "owieojoijf".to_string(),
         mesh_cfg: Some(r.trim().to_string()),
         name: name.to_string(),
+        join: None,
     })
 }
 

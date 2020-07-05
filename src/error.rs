@@ -9,6 +9,7 @@ pub enum Error {
     IPAMPersistenceFail,
     NeedSetupK8s,
     SetupK8sFail,
+    InitK8sFail,
 }
 
 impl fmt::Debug for Error {
@@ -23,6 +24,7 @@ impl fmt::Debug for Error {
             IPAMPersistenceFail => write!(f, "Can not persistence ip in file"),
             NeedSetupK8s => write!(f, "Need setup k8s env"),
             SetupK8sFail => write!(f, "Setup k8s env fail"),
+            InitK8sFail => write!(f, "Init k8s fail"),
         }
     }
 }

@@ -10,6 +10,7 @@ pub struct ARG {
     pub test: String,
     pub mesh_cfg: Option<String>,
     pub name: String,
+    pub join: Option<String>,
 }
 
 impl FromStr for ARG {
