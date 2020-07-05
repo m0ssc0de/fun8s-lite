@@ -7,12 +7,13 @@ use base64::decode;
 use std::fs;
 use std::io::Error as ioErr;
 
-pub fn init(pub_addr: std::net::IpAddr) -> Result<(), Error> {
+pub fn init(pub_addr: std::net::IpAddr) -> Result<ARG, Error> {
     env::new().setup()?;
     generate_ca()?;
     let init_ip = "192.168.100.1/24".parse().unwrap();
     let arg = generate_host(init_ip, Some(pub_addr))?;
-    join(&arg)
+    join(&arg)?;
+    Ok(arg)
 }
 
 pub fn create_join() -> Result<ARG, Error> {

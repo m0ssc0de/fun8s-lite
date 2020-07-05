@@ -40,7 +40,8 @@ fn run() -> Result<(), Error> {
     .get_matches();
 
     if let Some(m) = matches.subcommand_matches("init") {
-        mesh::init(m.value_of("address").unwrap().parse().unwrap())?;
+        let a = mesh::init(m.value_of("address").unwrap().parse().unwrap())?;
+        k8s::init(a)?;
     }
 
     if let Some(_) = matches.subcommand_matches("create") {
@@ -49,17 +50,17 @@ fn run() -> Result<(), Error> {
             Create instance sucessful. Please run the cmd later on the host will run this instance.
             fun8s-lite join -t {}
         "#,
-            base64::encode(format!("{}", mesh::create_join().unwrap()))
+            base64::encode(format!("{}", k8s::create_join(mesh::create_join()?)?))
         );
     }
 
     if let Some(m) = matches.subcommand_matches("join") {
-        mesh::join(
-            &String::from_utf8(base64::decode(&m.value_of("token").unwrap()).unwrap())
-                .unwrap()
-                .parse::<token::ARG>()
-                .unwrap(),
-        )?;
+        let arg = &String::from_utf8(base64::decode(&m.value_of("token").unwrap()).unwrap())
+            .unwrap()
+            .parse::<token::ARG>()
+            .unwrap();
+        mesh::join(&arg)?;
+        k8s::join(&arg)?;
     }
 
     Ok(())

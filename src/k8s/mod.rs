@@ -10,6 +10,8 @@ pub fn init(mut a: ARG) -> Result<ARG, Error> {
     match init_k8s() {
         Ok(j) => {
             a.join = Some(j);
+            copy_kube_config()?;
+            install_cni()?;
             Ok(a)
         }
         Err(e) => {
@@ -42,7 +44,7 @@ pub fn join(arg: &ARG) -> Result<(), Error> {
     match &arg.join {
         Some(j) => {
             if let Err(e) = run_cmd!(j) {
-                println!("join node fail");
+                println!("join node fail. {}", e);
                 return Err(Error::TokenError);
             }
         }
@@ -75,4 +77,27 @@ fn find_join(s: &str) -> Option<&str> {
             .next()?
             .trim(),
     )
+}
+
+fn copy_kube_config() -> Result<(), Error> {
+    let s = r#"
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+    "#;
+    if let Err(e) = env::run_s(s) {
+        println!("copy kube config fail. {}", e);
+        return Err(Error::InitK8sFail);
+    }
+    Ok(())
+}
+
+fn install_cni() -> Result<(), Error> {
+    if let Err(e) =
+        run_cmd!("kubectl apply -f https://docs.projectcalico.org/v3.14/manifests/calico.yaml")
+    {
+        println!("install cni fail. {}", e);
+        return Err(Error::InitK8sFail);
+    }
+    Ok(())
 }
