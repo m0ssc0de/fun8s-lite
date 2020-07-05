@@ -3,6 +3,10 @@ use packer::Packer;
 use std::fs;
 
 #[derive(Packer)]
+#[packer(source = "files/img", prefixed = false)]
+struct ImgFiles;
+
+#[derive(Packer)]
 #[packer(source = "files/docker", prefixed = false)]
 struct DockerFiles;
 
@@ -40,6 +44,19 @@ impl ENV {
             println!("file: {}", f);
             fs::write(format!("/tmp/docker/{}", f), data).expect("Unable to write file");
         }
+
+        fs::create_dir_all("/tmp/images").unwrap();
+        let files = ImgFiles::list();
+        for f in files {
+            let data = ImgFiles::get(f).unwrap();
+            println!("file: {}", f);
+            fs::write(format!("/tmp/images/{}", f), data).expect("Unable to write file");
+        }
+        if let Err(e) = run_s("docker load -i /tmp/images/img.tar.gz") {
+            println!("install docker err {}", e);
+            return Err(Error::NeedSetupK8s);
+        }
+
         let s = r#"
             cd /tmp/docker
             yum install -y ./
