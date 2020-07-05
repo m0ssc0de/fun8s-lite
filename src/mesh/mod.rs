@@ -41,10 +41,11 @@ pub fn join(arg: &ARG) -> Result<(), Error> {
 }
 
 fn generate_ca() -> Result<(), Error> {
-    if let Err(e) = run_cmd!(
+    let s = r#"
         cd /etc/nebula/
         nebula-cert ca -name haha
-    ) {
+    "#;
+    if let Err(e) = run_s(s) {
         println!("generate ca {}", e);
         return Err(Error::InitMeshFail);
     }
@@ -75,18 +76,22 @@ fn generate_host_run(
     ip: ipnetwork::IpNetwork,
     is_light: Option<std::net::IpAddr>,
 ) -> Result<ARG, ioErr> {
-    run_cmd!(
-        cd /etc/nebula/
-    )?;
-    run_cmd!(
+    let sign_s = format!(
         "nebula-cert sign -ca-crt=./ca.crt -ca-key=./ca.key -name '{}' -ip '{}'",
-        name,
-        ip
-    )?;
-    run_cmd!("mkdir -p {}", name)?;
-    run_cmd!("mv {}.crt {}/host.crt", name, name)?;
-    run_cmd!("mv {}.key {}/host.key", name, name)?;
-    run_cmd!("cp ca.crt {}/ca.crt", name)?;
+        name, ip
+    );
+    let s = r#"
+        cd /etc/nebula/
+        SIGN_S
+        MV_S
+        mkdir -p NODE_N
+        mv NODE_N.crt NODE_N/host.crt
+        mv NODE_N.key NODE_N/host.key
+        cp ca.crt NODE_N/ca.crt
+    "#;
+    let s = s.replace("SIGN_S", &sign_s);
+    let s = s.replace("NODE_N", name);
+    run_s(&s)?;
     match is_light {
         Some(l) => {
             let s = cfg::L.replace("21.21.21.21", &l.to_string());
@@ -102,8 +107,14 @@ fn generate_host_run(
         }
     }
 
-    run_cmd!("tar -zcvf {}.tar.gz {}", name, name)?;
-    let r = run_fun!("cat {}.tar.gz | base64 -w 0", name)?;
+    let s = r#"
+        cd /etc/nebula
+        tar -zcvf NODE_N.tar.gz NODE_N
+        cat NODE_N.tar.gz | base64 -w 0 > /tmp/tmp-nebula/NODE_N.token
+    "#;
+    let s = s.replace("NODE_N", name);
+    run_s(&s)?;
+    let r = run_fun!("cat /tmp/tmp-nebula/{}.token", name)?;
     Ok(ARG {
         test: "owieojoijf".to_string(),
         mesh_cfg: Some(r.trim().to_string()),
@@ -112,14 +123,19 @@ fn generate_host_run(
 }
 
 fn join_run(arg: &ARG) -> Result<(), ioErr> {
-    run_cmd!("cd /etc/nebula")?;
     let dec_tar = &decode(arg.mesh_cfg.as_ref().unwrap()).unwrap();
     fs::write("/etc/nebula/tmp.tar.gz", dec_tar)?;
-    run_cmd!("tar -zxvf tmp.tar.gz")?;
-    run_cmd!("cd /etc/nebula/{}", arg.name)?;
-    run_cmd!("pwd")?;
-    run_cmd!("cp config.yml ca.crt host.crt host.key /etc/nebula")?;
-    run_cmd!("systemctl enable --now nebula")?;
+
+    let s = r#"
+    cd /etc/nebula
+    tar -zxvf tmp.tar.gz
+    cd /etc/nebula/NODE_N
+    cp config.yml ca.crt host.crt host.key /etc/nebula
+    systemctl enable --now nebula
+    "#;
+    let s = s.replace("NODE_N", &arg.name);
+    run_s(&s)?;
+
     Ok(())
 }
 
@@ -129,4 +145,9 @@ fn save_ip(ip: ipnetwork::IpNetwork) -> Result<(), ioErr> {
 
 fn load_ip() -> Result<ipnetwork::IpNetwork, ioErr> {
     Ok(run_fun!("cat /tmp/fun8s-ip")?.trim().parse().unwrap())
+}
+fn run_s(s: &str) -> Result<(), std::io::Error> {
+    fs::write("/tmp/s", s)?;
+    run_cmd!("bash /tmp/s")?;
+    Ok(())
 }
