@@ -20,12 +20,37 @@ pub fn init(mut a: ARG) -> Result<ARG, Error> {
 }
 
 pub fn create_join(mut a: ARG) -> Result<ARG, Error> {
+    match run_fun!("kubeadm token create --print-join-command") {
+        Ok(o) => match find_join(&o) {
+            None => {
+                println!("kubeadm token create. Can not find join cmd");
+                return Err(Error::TokenError);
+            }
+            Some(j) => a.join = Some(j.to_string()),
+        },
+        Err(e) => {
+            println!("kubeadm token create. Error : {}", e);
+            return Err(Error::TokenError);
+        }
+    }
     Ok(a)
 }
 
 pub fn join(arg: &ARG) -> Result<(), Error> {
     println!("{}", arg);
     env::new().setup()?;
+    match &arg.join {
+        Some(j) => {
+            if let Err(e) = run_cmd!(j) {
+                println!("join node fail");
+                return Err(Error::TokenError);
+            }
+        }
+        None => {
+            println!("can not find join cmd");
+            return Err(Error::TokenError);
+        }
+    }
     Ok(())
 }
 
