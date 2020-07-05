@@ -45,6 +45,16 @@ impl ENV {
             fs::write(format!("/tmp/docker/{}", f), data).expect("Unable to write file");
         }
 
+        let s = r#"
+            cd /tmp/docker
+            yum install -y ./
+            systemctl enable --now docker
+        "#;
+        if let Err(e) = run_s(&s) {
+            println!("install docker err {}", e);
+            return Err(Error::NeedSetupK8s);
+        }
+
         fs::create_dir_all("/tmp/images").unwrap();
         let files = ImgFiles::list();
         for f in files {
@@ -53,16 +63,6 @@ impl ENV {
             fs::write(format!("/tmp/images/{}", f), data).expect("Unable to write file");
         }
         if let Err(e) = run_s("docker load -i /tmp/images/img.tar.gz") {
-            println!("install docker err {}", e);
-            return Err(Error::NeedSetupK8s);
-        }
-
-        let s = r#"
-            cd /tmp/docker
-            yum install -y ./
-            systemctl enable --now docker
-        "#;
-        if let Err(e) = run_s(&s) {
             println!("install docker err {}", e);
             return Err(Error::NeedSetupK8s);
         }
