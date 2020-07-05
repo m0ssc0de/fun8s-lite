@@ -43,7 +43,7 @@ pub fn join(arg: &ARG) -> Result<(), Error> {
     env::new().setup()?;
     match &arg.join {
         Some(j) => {
-            if let Err(e) = run_cmd!(j) {
+            if let Err(e) = run_cmd!("{}", j) {
                 println!("join node fail. {}", e);
                 return Err(Error::TokenError);
             }

@@ -11,22 +11,24 @@ impl ENV {
         }
     }
     fn check(&self) -> Result<(), Error> {
-        if let Err(e) = run_cmd!(
+        let check_cmd = r#"
             which dockerd
             which kubeadm
             which kubectl
             which kubelet
-        ) {
+        "#;
+        if let Err(e) = run_s(&check_cmd) {
             println!("check result error {}", e);
             return Err(Error::NeedSetupK8s);
         }
         Ok(())
     }
     fn install(&self) -> Result<(), Error> {
-        if let Err(e) = run_cmd!(
+        let s = r#"
             yum install docker -y
             systemctl enable --now docker
-        ) {
+        "#;
+        if let Err(e) = run_s(&s) {
             println!("install docker err {}", e);
             return Err(Error::NeedSetupK8s);
         }
