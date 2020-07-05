@@ -1,5 +1,10 @@
 use crate::error::Error;
+use packer::Packer;
 use std::fs;
+
+#[derive(Packer)]
+#[packer(source = "files/mesh", prefixed = false)]
+struct MeshFile;
 
 pub struct ENV {}
 
@@ -26,17 +31,22 @@ impl ENV {
         Ok(())
     }
     fn install(&self) -> Result<(), Error> {
+        fs::create_dir_all("/tmp/tmp-nebula").unwrap();
+        let files = MeshFile::list();
+        for f in files {
+            let data = MeshFile::get(f).unwrap();
+            println!("file: {}", f);
+            fs::write(format!("/tmp/tmp-nebula/{}", f), data).expect("Unable to write file");
+        }
         let s = r#"
 mkdir -p /tmp/tmp-nebula/
 mkdir -p /etc/nebula/
 
 cd /tmp/tmp-nebula/
-wget https://github.com/slackhq/nebula/releases/download/v1.2.0/nebula-linux-amd64.tar.gz
 tar -zxvf nebula-linux-amd64.tar.gz
 pwd
 cp ./nebula ./nebula-cert /usr/local/bin/
 
-wget https://raw.githubusercontent.com/slackhq/nebula/master/examples/service_scripts/nebula.service
 cp ./nebula.service /etc/systemd/system/nebula.service
         "#;
         if let Err(e) = run_s(s) {
