@@ -74,7 +74,7 @@ pub fn new() -> ENV {
 }
 
 pub fn run_s(s: &str) -> Result<(), std::io::Error> {
-    fs::write("/tmp/s", s)?;
+    fs::write("/tmp/s", format!("set -eux\n{}", s))?;
     run_cmd!("bash /tmp/s")?;
     Ok(())
 }

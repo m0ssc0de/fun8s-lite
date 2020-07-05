@@ -4,6 +4,7 @@ mod env;
 use crate::error::Error;
 use crate::token::ARG;
 use base64::decode;
+use env::run_s;
 use std::fs;
 use std::io::Error as ioErr;
 
@@ -147,9 +148,4 @@ fn save_ip(ip: ipnetwork::IpNetwork) -> Result<(), ioErr> {
 
 fn load_ip() -> Result<ipnetwork::IpNetwork, ioErr> {
     Ok(run_fun!("cat /tmp/fun8s-ip")?.trim().parse().unwrap())
-}
-fn run_s(s: &str) -> Result<(), std::io::Error> {
-    fs::write("/tmp/s", s)?;
-    run_cmd!("bash /tmp/s")?;
-    Ok(())
 }
