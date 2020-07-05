@@ -47,7 +47,7 @@ impl ENV {
 
         let s = r#"
             cd /tmp/docker
-            yum install -y ./
+            yum install -y ./*
             systemctl enable --now docker
         "#;
         if let Err(e) = run_s(&s) {
@@ -95,7 +95,7 @@ sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 
         let s = r#"
 cd /tmp/k8s/
-sudo yum install -y ./ --disableexcludes=kubernetes
+sudo yum install -y ./* --disableexcludes=kubernetes
 sudo systemctl enable --now kubelet
         "#;
         if let Err(e) = run_s(s) {
