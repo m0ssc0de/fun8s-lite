@@ -1,0 +1,11 @@
+k8s.gcr.io/kube-proxy:v1.18.5
+k8s.gcr.io/kube-controller-manager:v1.18.5
+k8s.gcr.io/kube-apiserver:v1.18.5
+k8s.gcr.io/kube-scheduler:v1.18.5
+docker.io/calico/node:v3.14.1
+docker.io/calico/pod2daemon-flexvol:v3.14.1
+docker.io/calico/cni:v3.14.1
+docker.io/calico/kube-controllers:v3.14.1
+k8s.gcr.io/pause:3.2    
+k8s.gcr.io/coredns:1.6.7  
+k8s.gcr.io/etcd:3.4.3-0
