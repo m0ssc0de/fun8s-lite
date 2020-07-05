@@ -1,5 +1,14 @@
 use crate::error::Error;
+use packer::Packer;
 use std::fs;
+
+#[derive(Packer)]
+#[packer(source = "files/docker", prefixed = false)]
+struct DockerFiles;
+
+#[derive(Packer)]
+#[packer(source = "files/k8s", prefixed = false)]
+struct K8sFiles;
 
 pub struct ENV {}
 
@@ -24,8 +33,16 @@ impl ENV {
         Ok(())
     }
     fn install(&self) -> Result<(), Error> {
+        fs::create_dir_all("/tmp/docker").unwrap();
+        let files = DockerFiles::list();
+        for f in files {
+            let data = DockerFiles::get(f).unwrap();
+            println!("file: {}", f);
+            fs::write(format!("/tmp/docker/{}", f), data).expect("Unable to write file");
+        }
         let s = r#"
-            yum install docker -y
+            cd /tmp/docker
+            yum install -y ./
             systemctl enable --now docker
         "#;
         if let Err(e) = run_s(&s) {
@@ -42,23 +59,26 @@ net.bridge.bridge-nf-call-iptables = 1
 EOF
 sudo sysctl --system
 
-cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
-[kubernetes]
-name=Kubernetes
-baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
-enabled=1
-gpgcheck=1
-repo_gpgcheck=1
-gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-exclude=kubelet kubeadm kubectl
-EOF
-
 # Set SELinux in permissive mode (effectively disabling it)
 sudo setenforce 0 || true
 sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 
-sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+        "#;
+        if let Err(e) = run_s(s) {
+            println!("install k8s error {}", e);
+            return Err(Error::SetupK8sFail);
+        }
+        fs::create_dir_all("/tmp/k8s").unwrap();
+        let files = K8sFiles::list();
+        for f in files {
+            let data = K8sFiles::get(f).unwrap();
+            println!("file: {}", f);
+            fs::write(format!("/tmp/k8s/{}", f), data).expect("Unable to write file");
+        }
 
+        let s = r#"
+cd /tmp/k8s/
+sudo yum install -y ./ --disableexcludes=kubernetes
 sudo systemctl enable --now kubelet
         "#;
         if let Err(e) = run_s(s) {
