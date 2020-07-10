@@ -57,7 +57,7 @@ pub fn join(arg: &ARG) -> Result<(), Error> {
 }
 
 pub fn reset() -> Result<(), Error> {
-    run_cmd!("kubeadm reset");
+    let _ = run_cmd!("kubeadm reset");
     Ok(())
 }
 

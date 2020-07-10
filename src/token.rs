@@ -7,8 +7,8 @@ use std::str::FromStr;
 
 #[derive(Serialize, Deserialize)]
 pub struct ARG {
-    pub test: String,
     pub mesh_cfg: Option<String>,
+    pub v_mesh_cfg: Option<String>,
     pub name: String,
     pub join: Option<String>,
 }
