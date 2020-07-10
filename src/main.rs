@@ -36,6 +36,11 @@ fn run() -> Result<(), Error> {
             (author: "m0ssc0de <hi.paul.q@gmail.com>")
             (@arg token: -t --token[TOKEN] +required "the token created by init instance")
         )
+        (@subcommand reset =>
+            (about: "reset a node")
+            (version: "0.0.1")
+            (author: "m0ssc0de <hi.paul.q@gmail.com>")
+        )
     )
     .get_matches();
 
@@ -61,6 +66,11 @@ fn run() -> Result<(), Error> {
             .unwrap();
         mesh::join(&arg)?;
         k8s::join(&arg)?;
+    }
+
+    if let Some(_) = matches.subcommand_matches("reset") {
+        mesh::reset()?;
+        k8s::reset()?;
     }
 
     Ok(())

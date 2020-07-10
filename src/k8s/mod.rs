@@ -56,6 +56,11 @@ pub fn join(arg: &ARG) -> Result<(), Error> {
     Ok(())
 }
 
+pub fn reset() -> Result<(), Error> {
+    run_cmd!("kubeadm reset");
+    Ok(())
+}
+
 fn init_k8s() -> Result<String, ioErr> {
     let r = run_fun!(
         "kubeadm init --control-plane-endpoint=192.168.100.1 --pod-network-cidr=192.186.0.0/16"

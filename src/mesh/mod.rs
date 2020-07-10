@@ -8,6 +8,15 @@ use env::run_s;
 use std::fs;
 use std::io::Error as ioErr;
 
+pub fn reset() -> Result<(), Error> {
+    let s = r#"
+systemctl stop nebula
+rm -rf /etc/nebula/*
+    "#;
+    env::run_s(s);
+    Ok(())
+}
+
 pub fn init(pub_addr: std::net::IpAddr) -> Result<ARG, Error> {
     env::new().setup()?;
     generate_ca()?;
