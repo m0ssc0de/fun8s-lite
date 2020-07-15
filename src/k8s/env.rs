@@ -18,7 +18,7 @@ impl ENV {
             which kubelet
         "#;
         if let Err(e) = run_s(&check_cmd) {
-            println!("check result error {}", e);
+            warn!("check result error {}", e);
             return Err(Error::NeedSetupK8s);
         }
         Ok(())
@@ -29,7 +29,7 @@ impl ENV {
             systemctl enable --now docker
         "#;
         if let Err(e) = run_s(&s) {
-            println!("install docker err {}", e);
+            warn!("install docker err {}", e);
             return Err(Error::NeedSetupK8s);
         }
 
@@ -62,7 +62,7 @@ sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 sudo systemctl enable --now kubelet
         "#;
         if let Err(e) = run_s(s) {
-            println!("install k8s error {}", e);
+            warn!("install k8s error {}", e);
             return Err(Error::SetupK8sFail);
         }
         Ok(())

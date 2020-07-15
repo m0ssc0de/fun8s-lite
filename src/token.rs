@@ -20,7 +20,7 @@ impl FromStr for ARG {
         match serde_json::from_str(s) {
             Ok(a) => Ok(a),
             Err(e) => {
-                println!("{}", e);
+                warn!("{}", e);
                 Err(Error::TokenError)
             }
         }

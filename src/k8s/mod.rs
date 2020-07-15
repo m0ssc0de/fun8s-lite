@@ -15,7 +15,7 @@ pub fn init(mut a: ARG) -> Result<ARG, Error> {
             Ok(a)
         }
         Err(e) => {
-            println!("init k8s error {}", e);
+            warn!("init k8s error {}", e);
             Err(Error::InitK8sFail)
         }
     }
@@ -25,13 +25,13 @@ pub fn create_join(mut a: ARG) -> Result<ARG, Error> {
     match run_fun!("kubeadm token create --print-join-command") {
         Ok(o) => match find_join(&o) {
             None => {
-                println!("kubeadm token create. Can not find join cmd");
+                warn!("kubeadm token create. Can not find join cmd");
                 return Err(Error::TokenError);
             }
             Some(j) => a.join = Some(j.to_string()),
         },
         Err(e) => {
-            println!("kubeadm token create. Error : {}", e);
+            warn!("kubeadm token create. Error : {}", e);
             return Err(Error::TokenError);
         }
     }
@@ -39,17 +39,16 @@ pub fn create_join(mut a: ARG) -> Result<ARG, Error> {
 }
 
 pub fn join(arg: &ARG) -> Result<(), Error> {
-    println!("{}", arg);
     env::new().setup()?;
     match &arg.join {
         Some(j) => {
             if let Err(e) = run_cmd!("{}", j) {
-                println!("join node fail. {}", e);
+                warn!("join node fail. {}", e);
                 return Err(Error::TokenError);
             }
         }
         None => {
-            println!("can not find join cmd");
+            warn!("can not find join cmd");
             return Err(Error::TokenError);
         }
     }
@@ -91,7 +90,7 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
     "#;
     if let Err(e) = env::run_s(s) {
-        println!("copy kube config fail. {}", e);
+        warn!("copy kube config fail. {}", e);
         return Err(Error::InitK8sFail);
     }
     Ok(())
@@ -101,7 +100,7 @@ fn install_cni() -> Result<(), Error> {
     if let Err(e) =
         run_cmd!("kubectl apply -f https://docs.projectcalico.org/v3.14/manifests/calico.yaml")
     {
-        println!("install cni fail. {}", e);
+        warn!("install cni fail. {}", e);
         return Err(Error::InitK8sFail);
     }
     Ok(())

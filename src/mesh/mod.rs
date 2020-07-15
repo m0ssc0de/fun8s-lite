@@ -36,7 +36,7 @@ pub fn create_join() -> Result<ARG, Error> {
             }
         }
         Err(e) => {
-            println!("{}", e);
+            warn!("{}", e);
             Err(Error::IPAMPersistenceFail)
         }
     }
@@ -45,7 +45,7 @@ pub fn create_join() -> Result<ARG, Error> {
 pub fn join(arg: &ARG) -> Result<(), Error> {
     env::new().setup()?;
     if let Err(e) = join_run(arg) {
-        println!("{}", e);
+        warn!("{}", e);
         return Err(Error::JoinMeshFail);
     }
     Ok(())
@@ -57,7 +57,7 @@ fn generate_ca() -> Result<(), Error> {
         nebula-cert ca -name haha
     "#;
     if let Err(e) = run_s(s) {
-        println!("generate ca {}", e);
+        warn!("generate ca {}", e);
         return Err(Error::InitMeshFail);
     }
     Ok(())
@@ -70,13 +70,13 @@ fn generate_host(
     match generate_host_run("node", private_ip, pub_addr) {
         Ok(arg) => {
             if let Err(e) = save_ip(private_ip) {
-                println!("{}", e);
+                warn!("{}", e);
                 return Err(Error::IPAMPersistenceFail);
             };
             Ok(arg)
         }
         Err(e) => {
-            println!("{}", e);
+            warn!("{}", e);
             Err(Error::InitMeshFail)
         }
     }
@@ -106,13 +106,13 @@ fn generate_host_run(
         Some(l) => {
             let s = cfg::L.replace("21.21.21.21", &l.to_string());
             let s = s.replace("am_lighthouse: false", "am_lighthouse: true");
-            println!("{}", s);
+            warn!("{}", s);
             fs::write(format!("/etc/nebula/{}/config.yml", name), s).expect("Unable to write file");
         }
         None => {
             let s = run_fun!("cat /etc/nebula/config.yml")?.trim().to_string();
             let s = s.replace("am_lighthouse: true", "am_lighthouse: false");
-            println!("{}", s);
+            warn!("{}", s);
             fs::write(format!("/etc/nebula/{}/config.yml", name), s).expect("Unable to write file");
         }
     }

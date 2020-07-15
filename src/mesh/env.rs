@@ -8,7 +8,7 @@ impl ENV {
         match self.check() {
             Ok(_) => Ok(()),
             Err(e) => {
-                println!("setup error {:?}", e);
+                warn!("setup error {:?}", e);
                 self.install()
             }
         }
@@ -40,7 +40,7 @@ wget https://raw.githubusercontent.com/slackhq/nebula/master/examples/service_sc
 cp ./nebula.service /etc/systemd/system/nebula.service
         "#;
         if let Err(e) = run_s(s) {
-            println!("install error {}", e);
+            warn!("install error {}", e);
             return Err(Error::SetupMeshFail);
         }
         Ok(())

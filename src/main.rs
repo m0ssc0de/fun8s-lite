@@ -9,7 +9,11 @@ mod token;
 
 use error::Error;
 
+#[macro_use]
+extern crate log;
+
 fn main() {
+    env_logger::init();
     run().unwrap();
 }
 
